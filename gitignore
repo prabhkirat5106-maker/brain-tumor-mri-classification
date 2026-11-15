@@ -1,0 +1,11 @@
+# dataset (download it from Kaggle instead)
+brain-tumor-mri-dataset/
+
+# model weights
+*.pt
+*.pth
+
+# notebook and Python clutter
+.ipynb_checkpoints/
+__pycache__/
+.venv/
