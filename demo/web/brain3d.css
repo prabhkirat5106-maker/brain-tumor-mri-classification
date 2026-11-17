@@ -1,0 +1,79 @@
+/* NeuroLens 3D brain viewer (brain3d.js). Used by the Gradio app and the static site. */
+.nb-root {
+  position: relative; height: 600px; overflow: hidden; border-radius: 16px;
+  background:
+    radial-gradient(60% 55% at 50% 45%, rgba(60, 110, 255, 0.18), transparent 70%),
+    radial-gradient(40% 40% at 70% 80%, rgba(224, 69, 143, 0.10), transparent 70%),
+    linear-gradient(180deg, #0b0e1f, #05060d);
+  user-select: none;
+}
+.nb-canvas, .nb-canvas canvas { position: absolute; inset: 0; display: block; cursor: grab; }
+.nb-canvas canvas { touch-action: none; }  /* swipes rotate the brain instead of scrolling the page */
+.nb-canvas canvas:active { cursor: grabbing; }
+.nb-hud { position: absolute; z-index: 3; display: flex; gap: 6px; }
+.nb-tl { top: 14px; left: 14px; right: 260px; }
+.nb-tr { top: 12px; right: 12px; }
+.nb-chip {
+  font-size: 12.5px; color: #c9cdef; padding: 6px 12px; border-radius: 999px;
+  background: rgba(12, 14, 30, 0.7); border: 1px solid rgba(140, 130, 255, 0.25); backdrop-filter: blur(8px);
+}
+.nb-chip.warn { color: #ffd9a0; border-color: rgba(255, 181, 71, 0.45); }
+.nb-chip.ok { color: #9ff5cf; border-color: rgba(62, 230, 168, 0.45); }
+.nb-tr button {
+  font: inherit; font-size: 12.5px; color: #b9bce0; cursor: pointer;
+  padding: 6px 12px; border-radius: 10px;
+  background: rgba(12, 14, 30, 0.7); border: 1px solid rgba(140, 130, 255, 0.22); backdrop-filter: blur(8px);
+  transition: all .15s;
+}
+.nb-tr button:hover { color: #fff; border-color: rgba(155, 123, 255, 0.6); }
+.nb-tr button.on { color: #fff; background: rgba(123, 92, 255, 0.35); border-color: rgba(155, 123, 255, 0.7); }
+.nb-hint {
+  position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); z-index: 2;
+  font-size: 12px; color: #6f7398; letter-spacing: .02em; pointer-events: none; white-space: nowrap;
+}
+.nb-empty {
+  position: absolute; left: 50%; bottom: 46px; transform: translateX(-50%); z-index: 2; pointer-events: none;
+  padding: 10px 18px; border-radius: 12px; font-size: 14px; color: #c9cdef;
+  background: rgba(12, 14, 30, 0.6); border: 1px dashed rgba(155, 123, 255, 0.4);
+}
+.nb-tag {
+  position: absolute; left: 0; top: 0; z-index: 2; pointer-events: none; display: none;
+  font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #fff;
+}
+.nb-tag > span:last-child {
+  position: absolute; left: 34px; top: -40px; white-space: nowrap; padding: 5px 10px; border-radius: 8px;
+  background: rgba(255, 34, 68, 0.22); border: 1px solid rgba(255, 70, 100, 0.7);
+  box-shadow: 0 0 18px rgba(255, 34, 68, 0.35); backdrop-filter: blur(6px);
+}
+.nb-tag::before {   /* leader line from the tumor to the label */
+  content: ""; position: absolute; left: 0; top: 0; width: 40px; height: 1px; background: rgba(255, 90, 120, 0.9);
+  transform-origin: 0 0; transform: rotate(-45deg);
+}
+.nb-tag.flip > span:last-child { left: auto; right: 34px; }
+.nb-tag.flip::before { transform: rotate(-135deg); }
+.nb-tag-dot {
+  position: absolute; left: -4px; top: -4px; width: 8px; height: 8px; border-radius: 50%;
+  background: #ff3355; box-shadow: 0 0 10px #ff3355;
+}
+.nb-tip {
+  position: absolute; left: 0; top: 0; z-index: 4; display: none; pointer-events: none;
+  max-width: 290px; padding: 8px 12px; border-radius: 12px; font-size: 13px; color: #e7e9f5;
+  background: rgba(12, 14, 30, 0.88); border: 1px solid rgba(140, 130, 255, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45); backdrop-filter: blur(10px);
+}
+.nb-tip.big { padding: 14px 16px; border-color: rgba(255, 70, 100, 0.55); box-shadow: 0 10px 40px rgba(255, 34, 68, 0.25); }
+.nb-tip-small { color: #b9bce0; }
+.nb-tip-title { font-size: 20px; font-weight: 700; color: var(--c); margin-bottom: 8px; }
+.nb-tip-title::before { content: "● "; color: #ff3355; font-size: 14px; vertical-align: 2px; }
+.nb-tip-row { display: flex; justify-content: space-between; gap: 14px; padding: 3px 0; font-size: 12.5px; }
+.nb-tip-row span { color: #8c90ad; }
+.nb-tip-row b { color: #f2f3ff; font-weight: 600; text-align: right; }
+.nb-tip-blurb { margin-top: 8px; color: #a7abcc; font-size: 12.5px; line-height: 1.45; }
+.nb-tip-warn { margin-top: 8px; color: #ffd9a0; font-size: 12px; }
+.nb-tip-foot { margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(140, 130, 255, 0.18); color: #6f7398; font-size: 11.5px; }
+
+@media (max-width: 720px) {
+  .nb-root { height: 460px; }
+  .nb-tl { right: 12px; top: 54px; }
+  .nb-hint { bottom: 8px; font-size: 11px; }
+}

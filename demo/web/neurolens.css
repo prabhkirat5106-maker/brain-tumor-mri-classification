@@ -1,0 +1,97 @@
+/* NeuroLens shared look: hero, prediction card, footer. Used by the Gradio app and the static site. */
+/* ---------- hero ---------- */
+.nl-hero { text-align: center; padding: 44px 12px 26px; position: relative; }
+.nl-hero h1 {
+  font-size: clamp(44px, 7vw, 76px);
+  font-weight: 700; letter-spacing: -0.04em; margin: 14px 0 8px;
+  color: #f2f3ff; line-height: 1;
+}
+.nl-hero h1 span {
+  background: linear-gradient(100deg, #9b7bff 10%, #f0569b 55%, #ffb547 95%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.nl-hero p { max-width: 640px; margin: 0 auto; color: #9ea2c4; font-size: 17px; line-height: 1.55; }
+.nl-hero em { color: #f2f3ff; font-style: normal; border-bottom: 1px dashed #f0569b; }
+.nl-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 14px; border-radius: 999px;
+  font-size: 12.5px; letter-spacing: 0.04em; color: #c9c4ff;
+  background: rgba(123, 92, 255, 0.12); border: 1px solid rgba(155, 123, 255, 0.35);
+}
+.nl-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: #3ee6a8;
+  box-shadow: 0 0 0 0 rgba(62, 230, 168, 0.7); animation: nl-pulse 2s infinite;
+}
+@keyframes nl-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(62, 230, 168, 0.6); }
+  70% { box-shadow: 0 0 0 9px rgba(62, 230, 168, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(62, 230, 168, 0); }
+}
+
+/* ---------- prediction card ---------- */
+.nl-card {
+  position: relative; overflow: hidden;
+  padding: 22px 22px 18px; border-radius: 18px;
+  background: linear-gradient(160deg, rgba(30, 30, 58, 0.85), rgba(14, 15, 30, 0.9));
+  border: 1px solid rgba(155, 123, 255, 0.2);
+  animation: nl-rise 0.45s ease-out;
+}
+.nl-card::before {
+  content: ""; position: absolute; inset: -1px; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(400px 160px at 0% 0%, color-mix(in srgb, var(--accent, #7b5cff) 30%, transparent), transparent 70%);
+}
+@keyframes nl-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.nl-kicker { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.16em; color: #8c90ad; position: relative; }
+.nl-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; position: relative; }
+.nl-label { font-size: 34px; font-weight: 700; letter-spacing: -0.02em; color: var(--accent, #f2f3ff); margin: 4px 0 2px; }
+.nl-blurb { color: #a7abcc; font-size: 14.5px; line-height: 1.5; margin: 4px 0 16px; position: relative; }
+.nl-ring {
+  --size: 74px; width: var(--size); height: var(--size); flex: none; border-radius: 50%;
+  display: grid; place-items: center;
+  background: conic-gradient(var(--accent) calc(var(--p) * 1%), rgba(255, 255, 255, 0.07) 0);
+  -webkit-mask: radial-gradient(farthest-side, transparent 72%, #000 73%);
+          mask: radial-gradient(farthest-side, transparent 72%, #000 73%);
+}
+.nl-rows { display: grid; gap: 9px; position: relative; }
+.nl-row { display: grid; grid-template-columns: 96px 1fr 52px; align-items: center; gap: 10px; font-size: 13.5px; }
+.nl-row-name { color: #c4c7e4; }
+.nl-row-pct { text-align: right; font-family: "JetBrains Mono", monospace; color: #e7e9f5; font-size: 12.5px; }
+.nl-bar { height: 8px; border-radius: 99px; background: rgba(255, 255, 255, 0.06); overflow: hidden; }
+.nl-fill {
+  height: 100%; width: var(--w); border-radius: inherit;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--c) 55%, transparent), var(--c));
+  box-shadow: 0 0 12px color-mix(in srgb, var(--c) 60%, transparent);
+  animation: nl-grow 0.9s cubic-bezier(.2, .8, .2, 1);
+}
+@keyframes nl-grow { from { width: 0; } }
+.nl-note {
+  margin-top: 14px; padding: 9px 12px; border-radius: 10px; font-size: 13px; color: #ffd9a0;
+  background: rgba(255, 181, 71, 0.08); border: 1px solid rgba(255, 181, 71, 0.25);
+}
+.nl-empty { --accent: #7b5cff; }
+
+/* ring percentage label sits on top of the masked ring */
+.nl-ringwrap { position: relative; width: 74px; height: 74px; flex: none; }
+.nl-ringwrap .nl-ring { position: absolute; inset: 0; }
+.nl-ringwrap b {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  font-family: "JetBrains Mono", monospace; font-size: 17px; color: #f2f3ff; font-weight: 600;
+}
+
+.nl-view {
+  margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(155, 123, 255, 0.14);
+  font-size: 12.5px; color: #8c90ad; position: relative;
+}
+
+/* ---------- footer ---------- */
+.nl-foot {
+  margin-top: 18px; padding: 16px 20px; border-radius: 14px;
+  color: #8c90ad; font-size: 13px; line-height: 1.6; text-align: center;
+  border: 1px solid rgba(155, 123, 255, 0.12); background: rgba(14, 15, 30, 0.5);
+}
+.nl-foot b { color: #ffb0cf; }
+.nl-foot code { color: #c9c4ff; background: rgba(123, 92, 255, 0.12); padding: 1px 6px; border-radius: 6px; }
+
+@media (max-width: 720px) {
+  .nl-label { font-size: 28px; }
+}
