@@ -101,6 +101,40 @@ MRI scans come in three views: axial (top-down), coronal (from the front) and sa
 - The model does not simply treat "axial" as "no tumor": **all 25 axial tumor scans in the sample were classified correctly** (exact 95% confidence interval: about 86% to 100%).
 - Accuracy in the sample by view: axial 42/43, coronal 15/15, sagittal 22/22. The one axial error is #440, a healthy scan called meningioma.
 
+## External test: does 99% hold on other hospitals' scans?
+
+The test set above comes from the same Kaggle collection as the training data. To check scans from elsewhere, I ran
+the final model on [PMRAM](https://data.mendeley.com/datasets/m7w55sw88b/1) (CC BY 4.0), a four-class dataset
+described as collected from hospitals in Bangladesh (1,505 raw images, 1,410 after removing exact copies).
+
+**Most of it turned out not to be external.** MD5 hashing found no matches, but PMRAM images are re-cropped and
+re-sharpened, so I compared every PMRAM image with every Kaggle image using a 256-bit difference hash and checked
+pairs by eye. **895 PMRAM images are the same scans as Kaggle images**, with the same labels, including almost every
+pituitary image. On those copies the model scores 99.7%, a number that would have looked like a perfect external result.
+
+**On the 425 images that are not in the Kaggle data:**
+
+| Class | Images | Recall (external) | Recall (Kaggle test set) |
+|---|---|---|---|
+| Glioma | 146 | **82.9%** | 99.2% |
+| Meningioma | 238 | **87.0%** | 98.4% |
+| No tumor | 41 | **100%** | 99.2% |
+| Pituitary | 0 | not testable | 99.2% |
+| **Overall** | **425** | **86.8%** | 99.0% |
+
+![Confusion matrix on independent PMRAM images](figures/external_confusion_matrix.png)
+
+- Accuracy drops by about 12 points on scans from other sources: the model works, but 99% does not transfer.
+- **Glioma is the weakest class.** Its errors are spread over all three other classes.
+- **The model is overconfident when wrong:** 14 of the 56 errors had over 90% confidence.
+- Three glioblastoma MRIs from Wikimedia Commons, older scanned films with text overlays, were all misclassified
+  (twice as meningioma at over 99% confidence, once as no tumor).
+- Caveats: only 41 independent no-tumor images and no pituitary images, and some "independent" images may be other
+  slices from patients in the Kaggle data, which hashing cannot detect. Treat 86.8% as a rough estimate.
+
+Reproduce with `python external_test/evaluate_pmram.py --pmram <Raw folder> --kaggle <dataset folder>`; results are
+in [`external_test/results.json`](external_test/results.json).
+
 ## Limitations
 
 1. **The no-tumor class appears to come from different sources.** Many no-tumor images look different in style (bright-fluid scan types, one image that looks like a CT scan rather than an MRI, rulers, arrows and text burned into a few images). The model may partly separate no-tumor scans by style, which the view audit cannot rule out. Performance on healthy scans from the same scanners as the tumor scans could be lower.
@@ -108,7 +142,7 @@ MRI scans come in three views: axial (top-down), coronal (from the front) and sa
 3. **Square resize.** Every image is stretched to 224×224, which distorts scans that are not square.
 4. **Only exact duplicates were removed.** Near-duplicates (the same scan resized, cropped or re-saved) would not match by hash and may remain.
 5. **One training run per model.** Differences under about 1% between runs are within normal run-to-run variation.
-6. **Not a medical tool.** Test performance on one public dataset says nothing about performance on real patients.
+6. **Not a medical tool.** Test performance on one public dataset says nothing about performance on real patients. On independent external images, accuracy fell to 86.8% (see [External test](#external-test-does-99-hold-on-other-hospitals-scans)).
 
 ## Repository
 
@@ -117,13 +151,16 @@ brain_mri_cnn.ipynb   full notebook, with outputs
 figures/              plots used in this README
 requirements.txt      Python packages for the notebook
 demo/                 NeuroLens: browser and Gradio demo (see demo/README.md)
+external_test/        evaluation on the PMRAM dataset, with duplicate detection
 ```
 
 The dataset and trained weights (`*.pt`) are not included (see `.gitignore`). Download the dataset from Kaggle, set `data_path` in the notebook, and run the cells in order. To run the demo locally, copy the saved `resnet18_best.pt` into `demo/weights/`.
 
 ## Next steps
 
-- Check for near-duplicates with perceptual hashing.
+- Improve external accuracy, especially glioma: crop to the head before resizing, add contrast/blur/zoom augmentation, and train on more varied sources. Measure on the independent PMRAM images before and after.
+- Calibrate confidence (for example temperature scaling) so wrong answers stop showing over 90% confidence.
+- Check the Kaggle data itself for near-duplicates with perceptual hashing (the method used for the external test).
 - Collect or find no-tumor scans in the same style as the tumor scans, and test whether no-tumor precision holds.
 - Repeat training with several seeds and report the spread.
 - ~~A small Gradio demo that shows the prediction and its Grad-CAM heatmap.~~ Done: see [Live demo](#live-demo).
