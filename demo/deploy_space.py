@@ -50,8 +50,12 @@ def main():
     sdk = "gradio" if args.gradio else "static"
     folder = HERE if args.gradio else HERE / "web"
 
-    print(f"Creating or updating {sdk} Space {repo_id} ({'public' if args.public else 'private'})...")
-    api.create_repo(repo_id, repo_type="space", space_sdk=sdk, private=not args.public, exist_ok=True)
+    exists = api.repo_exists(repo_id, repo_type="space")
+    if exists:
+        print(f"Updating {sdk} Space {repo_id}...")
+    else:
+        print(f"Creating {sdk} Space {repo_id} ({'public' if args.public else 'private'})...")
+        api.create_repo(repo_id, repo_type="space", space_sdk=sdk, private=not args.public)
 
     print("Uploading files (the 45 MB model takes a moment)...")
     api.upload_folder(repo_id=repo_id, repo_type="space", folder_path=folder,
@@ -64,7 +68,7 @@ def main():
                         repo_type="space", commit_message="Space card")
 
     print(f"\nDone: https://huggingface.co/spaces/{repo_id}")
-    if not args.public:
+    if api.space_info(repo_id).private:
         print("It's private. Once it works, switch it to public under Settings on that page.")
 
 

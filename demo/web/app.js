@@ -133,7 +133,7 @@ function pilResize(src, sw, sh, ch, dw, dh) {
 
 // full-resolution RGB pixels of the image (optionally mirrored left-right)
 function imageRGB(img, mirror = false) {
-  const W = img.naturalWidth, H = img.naturalHeight;
+  const W = img.width, H = img.height;
   const c = document.createElement("canvas");
   c.width = W; c.height = H;
   const g = c.getContext("2d", { willReadFrequently: true });
@@ -538,11 +538,9 @@ function renderError(err) {
 
 // ------------------------------------------------------------------ main flow
 async function setImage(src, label) {
-  const img = new Image();
-  img.crossOrigin = "anonymous";
-  img.src = src;
-  await img.decode();
-  state.image = img;
+  // decode without colour management, like Pillow: embedded ICC profiles would otherwise shift grey levels
+  const blob = await (await fetch(src)).blob();
+  state.image = await createImageBitmap(blob, { colorSpaceConversion: "none" });
   state.cache = null;
   $("#preview").src = src;
   $("#preview").hidden = false;
@@ -587,7 +585,7 @@ async function analyzeNow() {
   const probs = softmax(c.logits);
   const top = argmax(probs);
   const target = state.explain === "top" ? top : CLASSES.indexOf(state.explain);
-  const cam = camToFull(classMap(c.acts, target), c.box, state.image.naturalWidth, state.image.naturalHeight);
+  const cam = camToFull(classMap(c.acts, target), c.box, state.image.width, state.image.height);
 
   let view, conf, facing = null;
   const manual = state.view != null;
