@@ -6,9 +6,9 @@ Both are linear models on the trained ResNet18's 512-d avgpool features, fitted 
 80 hand-labelled test-split scans in tools/view_labels.json:
 
 - view (axial / coronal / sagittal): ResNet features + 3 silhouette features
-  (left-right symmetry, tissue at the bottom edge, height/width). Leave-one-out: 76/80.
+  (left-right symmetry, tissue at the bottom edge, height/width). Leave-one-out: 75/80 (v2 features; 76/80 on v1).
 - facing (sagittal only): features(image) - features(mirrored image), so mirroring a scan
-  exactly flips the answer. Trained on both orientations of each scan. Leave-one-out: 20/22.
+  exactly flips the answer. Trained on both orientations of each scan. Leave-one-out: 21/22 (v2; 20/22 on v1).
 """
 import json
 import sys

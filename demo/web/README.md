@@ -29,7 +29,9 @@ with the model's evidence mapped onto an interactive 3D brain.
 | Architecture | ResNet18 (ImageNet weights), new 4-way head |
 | Data | Kaggle `tombackert/brain-tumor-mri-data`, 7,153 images, 6,726 after removing exact duplicates |
 | Split | 70 / 15 / 15 stratified (4,708 / 1,009 / 1,009), de-duplicated before splitting |
-| Test accuracy | **99.0%** (999 / 1,009), macro F1 0.990 |
+| Preprocessing | crop to the head, pad to a square, resize to 224×224 (v2) |
+| Test accuracy | **99.0%** (999 / 1,009) |
+| Independent outside scans | **97.9%** (416 / 425, PMRAM images not in the training data) |
 
 The heatmap is the class activation map from `layer4`. For a ResNet (global average pool + linear head) it
 equals Grad-CAM exactly, so the browser computes it without gradients.
@@ -39,8 +41,8 @@ equals Grad-CAM exactly, so the browser computes it without gradients.
 One 2D slice fixes only two of the three coordinates, so the position is an **estimate on a template brain**
 (FreeSurfer fsaverage5 cortex; the cerebellum and brainstem are stylised shapes):
 
-1. Linear heads on the ResNet's features detect the slice orientation (axial / coronal / sagittal: 76/80 correct
-   with leave-one-out on hand-labelled test scans) and which way a sagittal slice faces (20/22). Low-confidence
+1. Linear heads on the ResNet's features detect the slice orientation (axial / coronal / sagittal: 75/80 correct
+   with leave-one-out on hand-labelled test scans) and which way a sagittal slice faces (21/22). Low-confidence
    guesses are flagged, and **Scan view** overrides them.
 2. The heatmap's hotspot is converted from pixels to millimetres using the head outline.
 3. The missing coordinate comes from the middle of the brain along that axis, plus anatomy per class: pituitary

@@ -1,6 +1,8 @@
 // NeuroLens, browser edition: the whole pipeline from model.py, running client-side.
-// ResNet18 runs with onnxruntime-web (WASM). The heatmap is the class activation map,
-// which for this architecture equals Grad-CAM exactly (see tools/export_web.py).
+// ResNet18 (v2) runs with onnxruntime-web (WASM). Like head_crop.py, every scan is cropped to
+// the head and padded to a square before the model sees it. The heatmap is the class activation
+// map, which for this architecture equals Grad-CAM exactly (see tools/export_web.py); it is
+// computed on the crop and mapped back onto the full image.
 /* global ort */
 
 const ORT_BASE = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/";
@@ -79,6 +81,135 @@ async function loadAll() {
 }
 
 // ------------------------------------------------------------------ image -> tensors
+// Pillow's resize (bilinear with antialiasing), so the browser feeds the model the same pixels
+// as the Python pipeline the reported accuracy comes from. Separable: horizontal pass, round to
+// 8 bits, vertical pass, like Pillow's ImagingResample.
+function pilWeights(inSize, outSize) {
+  const scale = inSize / outSize, fs = Math.max(1, scale), support = fs, ss = 1 / fs;
+  const taps = [];
+  for (let o = 0; o < outSize; o++) {
+    const center = (o + 0.5) * scale;
+    const lo = Math.max(0, Math.trunc(center - support + 0.5));
+    const hi = Math.min(inSize, Math.trunc(center + support + 0.5));
+    const w = [];
+    let sum = 0;
+    for (let i = lo; i < hi; i++) {
+      const t = Math.abs((i - center + 0.5) * ss);
+      const v = t < 1 ? 1 - t : 0;
+      w.push(v);
+      sum += v;
+    }
+    taps.push({ lo, w: sum ? w.map((v) => v / sum) : w });
+  }
+  return taps;
+}
+
+function pilResize(src, sw, sh, ch, dw, dh) {
+  const tx = pilWeights(sw, dw), ty = pilWeights(sh, dh);
+  const mid = new Uint8ClampedArray(dw * sh * ch);
+  for (let y = 0; y < sh; y++) {
+    for (let x = 0; x < dw; x++) {
+      const { lo, w } = tx[x];
+      for (let c = 0; c < ch; c++) {
+        let acc = 0;
+        for (let k = 0; k < w.length; k++) acc += w[k] * src[(y * sw + lo + k) * ch + c];
+        mid[(y * dw + x) * ch + c] = Math.round(acc);
+      }
+    }
+  }
+  const out = new Uint8ClampedArray(dw * dh * ch);
+  for (let y = 0; y < dh; y++) {
+    const { lo, w } = ty[y];
+    for (let x = 0; x < dw; x++) {
+      for (let c = 0; c < ch; c++) {
+        let acc = 0;
+        for (let k = 0; k < w.length; k++) acc += w[k] * mid[((lo + k) * dw + x) * ch + c];
+        out[(y * dw + x) * ch + c] = Math.round(acc);
+      }
+    }
+  }
+  return out;
+}
+
+// full-resolution RGB pixels of the image (optionally mirrored left-right)
+function imageRGB(img, mirror = false) {
+  const W = img.naturalWidth, H = img.naturalHeight;
+  const c = document.createElement("canvas");
+  c.width = W; c.height = H;
+  const g = c.getContext("2d", { willReadFrequently: true });
+  if (mirror) { g.translate(W, 0); g.scale(-1, 1); }
+  g.drawImage(img, 0, 0);
+  const d = g.getImageData(0, 0, W, H).data;
+  const rgb = new Uint8ClampedArray(W * H * 3);
+  for (let i = 0; i < W * H; i++) { rgb[i * 3] = d[i * 4]; rgb[i * 3 + 1] = d[i * 4 + 1]; rgb[i * 3 + 2] = d[i * 4 + 2]; }
+  return { rgb, W, H };
+}
+
+// head crop (same steps as head_crop.py): square box around the bright rows/columns, 8% margin
+function headBox({ rgb, W, H }) {
+  const scale = 256 / Math.max(W, H);
+  const tw = Math.max(1, Math.round(W * scale)), th = Math.max(1, Math.round(H * scale));
+  const L = new Uint8ClampedArray(W * H);  // Pillow "L": convert first, then resize
+  for (let i = 0; i < W * H; i++) L[i] = (rgb[i * 3] * 19595 + rgb[i * 3 + 1] * 38470 + rgb[i * 3 + 2] * 7471 + 0x8000) >> 16;
+  const small = pilResize(L, W, H, 1, tw, th);
+  const gray = Float32Array.from(small, (v) => v / 255);
+  const thr = Math.max(0.08, percentile(gray, 60) * 0.5);
+  const rowCount = new Uint32Array(th), colCount = new Uint32Array(tw);
+  for (let y = 0; y < th; y++) for (let x = 0; x < tw; x++) if (gray[y * tw + x] > thr) { rowCount[y]++; colCount[x]++; }
+  const rows = [...rowCount.keys()].filter((y) => rowCount[y] >= 0.02 * tw);
+  const cols = [...colCount.keys()].filter((x) => colCount[x] >= 0.02 * th);
+  if (rows.length < 8 || cols.length < 8) {
+    const side = Math.max(W, H);
+    return { left: (W - side) / 2, top: (H - side) / 2, side };
+  }
+  const y0 = rows[0] / scale, y1 = (rows[rows.length - 1] + 1) / scale;
+  const x0 = cols[0] / scale, x1 = (cols[cols.length - 1] + 1) / scale;
+  const side = Math.max(x1 - x0, y1 - y0) * 1.08;
+  return { left: (x0 + x1) / 2 - side / 2, top: (y0 + y1) / 2 - side / 2, side };
+}
+
+// the model's input: the head crop, padded black, resized to 224x224, as RGBA like canvas data
+function cropPixels({ rgb, W, H }, box) {
+  const s = Math.max(1, Math.round(box.side)), ox = Math.round(-box.left), oy = Math.round(-box.top);
+  const crop = new Uint8ClampedArray(s * s * 3);
+  for (let y = 0; y < s; y++) {
+    const sy = y - oy;
+    if (sy < 0 || sy >= H) continue;
+    for (let x = 0; x < s; x++) {
+      const sx = x - ox;
+      if (sx < 0 || sx >= W) continue;
+      const a = (sy * W + sx) * 3, b = (y * s + x) * 3;
+      crop[b] = rgb[a]; crop[b + 1] = rgb[a + 1]; crop[b + 2] = rgb[a + 2];
+    }
+  }
+  const small = pilResize(crop, s, s, 3, N, N);
+  const out = new Uint8ClampedArray(N * N * 4);
+  for (let i = 0; i < N * N; i++) {
+    out[i * 4] = small[i * 3]; out[i * 4 + 1] = small[i * 3 + 1]; out[i * 4 + 2] = small[i * 3 + 2]; out[i * 4 + 3] = 255;
+  }
+  return out;
+}
+
+// heatmap over the crop -> heatmap over the full image (resized to 224x224), like grid_sample
+function camToFull(cam, box, W, H) {
+  const out = new Float32Array(N * N);
+  const at = (x, y) => (x >= 0 && y >= 0 && x < N && y < N ? cam[y * N + x] : 0);
+  let hi = 0;
+  for (let v = 0; v < N; v++) {
+    const sy = (((v + 0.5) / N) * H - box.top) / box.side * N - 0.5;
+    const y0 = Math.floor(sy), ly = sy - y0;
+    for (let u = 0; u < N; u++) {
+      const sx = (((u + 0.5) / N) * W - box.left) / box.side * N - 0.5;
+      const x0 = Math.floor(sx), lx = sx - x0;
+      const val = (1 - ly) * ((1 - lx) * at(x0, y0) + lx * at(x0 + 1, y0)) + ly * ((1 - lx) * at(x0, y0 + 1) + lx * at(x0 + 1, y0 + 1));
+      out[v * N + u] = val;
+      if (val > hi) hi = val;
+    }
+  }
+  for (let i = 0; i < out.length; i++) out[i] /= hi + 1e-8;
+  return out;
+}
+
 function drawSquare(img, mirror = false) {
   const c = document.createElement("canvas");
   c.width = c.height = N;
@@ -209,7 +340,8 @@ function detectView(pooled, geo) {
 
 async function detectFacing(pooled) {
   if (!state.cache.mirrorPooled) {
-    state.cache.mirrorPooled = (await runModel(drawSquare(state.image, true))).pooled;
+    const mirrored = imageRGB(state.image, true);  // like ImageOps.mirror, then crop it the same way
+    state.cache.mirrorPooled = (await runModel(cropPixels(mirrored, headBox(mirrored)))).pooled;
   }
   const f = state.heads.facing;
   let s = 0;
@@ -445,16 +577,17 @@ async function analyzeNow() {
   if (!state.image) return;
   await state.ready;
   if (!state.cache) {
-    const px = drawSquare(state.image);
-    const gray = toGray(px);
+    const gray = toGray(drawSquare(state.image));  // full image: view detection, overlay, 3D placement
     const hm = headMask(gray);
-    state.cache = { gray, hm, geo: geometryFeatures(gray, hm), ...(await runModel(px)) };
+    const full = imageRGB(state.image);
+    const box = headBox(full);                     // head crop: what the model sees
+    state.cache = { gray, hm, box, geo: geometryFeatures(gray, hm), ...(await runModel(cropPixels(full, box))) };
   }
   const c = state.cache;
   const probs = softmax(c.logits);
   const top = argmax(probs);
   const target = state.explain === "top" ? top : CLASSES.indexOf(state.explain);
-  const cam = classMap(c.acts, target);
+  const cam = camToFull(classMap(c.acts, target), c.box, state.image.naturalWidth, state.image.naturalHeight);
 
   let view, conf, facing = null;
   const manual = state.view != null;

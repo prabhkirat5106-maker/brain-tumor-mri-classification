@@ -1,8 +1,10 @@
 """Model loading, prediction, Grad-CAM, scan-view detection and 3D placement.
 
-Mirrors the notebook: ResNet18 with a 4-way head, 224x224 resize, ImageNet
-normalization, Grad-CAM on layer4[-1]. Grad-CAM is implemented with hooks so
-the demo doesn't need the `grad-cam` package.
+Uses the v2 model (training/train_v2.py): ResNet18 with a 4-way head; every scan is
+cropped to the head and padded to a square (head_crop.py), then resized to 224x224 with
+ImageNet normalization. Grad-CAM on layer4[-1], implemented with hooks so the demo
+doesn't need the `grad-cam` package. The heatmap is computed on the cropped input and
+mapped back onto the full image for the overlay and the 3D placement.
 
 On top of that, two tiny linear heads (weights/view_head.pt, trained by
 tools/train_view_head.py) read the same backbone features to guess the slice
@@ -20,10 +22,12 @@ from PIL import Image, ImageOps
 from torch import nn
 from torchvision import models, transforms
 
+from head_crop import crop_to_head, head_box
+
 HERE = Path(__file__).parent
 CLASSES = ["glioma", "meningioma", "notumor", "pituitary"]  # sorted, same as notebook
 VIEWS = ["axial", "coronal", "sagittal"]
-WEIGHTS = HERE / "weights" / "resnet18_best.pt"
+WEIGHTS = HERE / "weights" / "resnet18_v2.pt"
 VIEW_HEAD = HERE / "weights" / "view_head.pt"
 BRAIN_MESH = HERE / "web" / "brain.bin"
 
@@ -78,11 +82,31 @@ class GradCAM:
 cam_engine = GradCAM(model, model.layer4[-1])
 
 
+def model_input(image: Image.Image):
+    """Head-cropped, normalized tensor [1, 3, 224, 224] plus the crop box (left, top, side)."""
+    rgb = image.convert("RGB")
+    box = head_box(rgb)
+    return eval_transform(crop_to_head(rgb, box)).unsqueeze(0).to(device), box
+
+
 def backbone_features(image: Image.Image) -> torch.Tensor:
     """512-d avgpool features of the trained ResNet (no gradients)."""
     with torch.no_grad():
-        model(eval_transform(image.convert("RGB")).unsqueeze(0).to(device))
+        model(model_input(image)[0])
     return cam_engine.pooled[0].cpu()
+
+
+def cam_to_full(cam, box, size):
+    """Map a heatmap over the square crop back onto the full image, resized to 224x224."""
+    w, h = size
+    left, top, side = box
+    u = (torch.arange(224) + 0.5) / 224
+    gx = 2 * (u * w - left) / side - 1   # full-image pixel -> crop coordinate in [-1, 1]
+    gy = 2 * (u * h - top) / side - 1
+    grid = torch.stack(torch.meshgrid(gy, gx, indexing="ij")[::-1], -1)[None].float()
+    out = F.grid_sample(torch.as_tensor(cam)[None, None].float(), grid, mode="bilinear",
+                        padding_mode="zeros", align_corners=False)[0, 0].numpy()
+    return out / (out.max() + 1e-8)
 
 
 # ---------------------------------------------------------------- scan geometry
@@ -290,9 +314,10 @@ def locate(cam, gray, view, facing, cls):
 def analyze(image: Image.Image, target: int | None = None, view_override: str | None = None):
     """Everything the UI needs for one scan."""
     rgb = image.convert("RGB")
-    x = eval_transform(rgb).unsqueeze(0).to(device)
-    probs, tgt, cam = cam_engine(x, target)
+    x, box = model_input(rgb)
+    probs, tgt, cam_crop = cam_engine(x, target)
     feat = cam_engine.pooled[0].cpu()
+    cam = cam_to_full(cam_crop, box, rgb.size)  # everything below works on the full image
     gray = np.asarray(rgb.resize((224, 224)).convert("L"), dtype=np.float32) / 255.0
 
     if view_override:
