@@ -1,0 +1,79 @@
+{
+ "same_scan_as_kaggle": {
+  "n": 895,
+  "accuracy": 0.9966,
+  "confusion": [
+   [
+    208,
+    2,
+    0,
+    0
+   ],
+   [
+    0,
+    42,
+    0,
+    0
+   ],
+   [
+    1,
+    0,
+    270,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    372
+   ]
+  ],
+  "recall": {
+   "glioma": 0.9905,
+   "meningioma": 1.0,
+   "notumor": 0.9963,
+   "pituitary": 1.0
+  },
+  "wrong": 3,
+  "wrong_over_90pct_confident": 2
+ },
+ "independent": {
+  "n": 425,
+  "accuracy": 0.8682,
+  "confusion": [
+   [
+    121,
+    9,
+    7,
+    9
+   ],
+   [
+    0,
+    207,
+    3,
+    28
+   ],
+   [
+    0,
+    0,
+    41,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  "recall": {
+   "glioma": 0.8288,
+   "meningioma": 0.8697,
+   "notumor": 1.0,
+   "pituitary": null
+  },
+  "wrong": 56,
+  "wrong_over_90pct_confident": 14
+ },
+ "between_cutoffs_excluded": 90
+}
