@@ -1,0 +1,8 @@
+# Gradio itself comes from sdk_version in README.md on Spaces.
+# CPU-only torch wheels: free Spaces have no GPU, and these are ~10x smaller than the CUDA build.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch>=2.6
+torchvision>=0.21
+plotly==7.0.0
+numpy
+pillow

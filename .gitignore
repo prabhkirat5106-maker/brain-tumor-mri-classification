@@ -9,3 +9,7 @@ brain-tumor-mri-dataset/
 .ipynb_checkpoints/
 __pycache__/
 .venv/
+
+# demo: the small view/facing head is part of the demo, the browser model is generated
+!demo/weights/view_head.pt
+demo/web/model/*.onnx

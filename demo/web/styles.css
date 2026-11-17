@@ -1,0 +1,112 @@
+/* Static-site layout. Shared look lives in neurolens.css (hero, card, footer) and brain3d.css (viewer). */
+:root {
+  --bg: #06070f;
+  --text: #e7e9f5;
+  --muted: #8c90ad;
+  --panel: rgba(20, 22, 40, 0.55);
+  --line: rgba(140, 130, 255, 0.16);
+  --accent: #7b5cff;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; min-height: 100vh; color: var(--text);
+  font: 15px/1.5 "Space Grotesk", system-ui, sans-serif;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(123, 92, 255, 0.22), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(224, 69, 143, 0.16), transparent 60%),
+    radial-gradient(800px 600px at 50% 120%, rgba(40, 200, 255, 0.10), transparent 60%),
+    var(--bg);
+  background-attachment: fixed;
+}
+body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: -1;
+  background-image:
+    linear-gradient(rgba(150, 140, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(150, 140, 255, 0.05) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse at 50% 20%, black 30%, transparent 75%);
+}
+.wrap { max-width: 1320px; margin: 0 auto; padding: 0 20px 40px; }
+.privacy {
+  margin-top: 14px; font-size: 13px; color: #9ff5cf;
+}
+
+.layout { display: grid; grid-template-columns: minmax(300px, 4fr) minmax(0, 7fr); gap: 20px; align-items: start; }
+.col-left, .col-right { display: grid; gap: 16px; min-width: 0; }
+
+.panel {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 18px;
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+}
+.mini-label { font-size: 12.5px; color: #b9bce0; margin-bottom: 8px; display: flex; justify-content: space-between; }
+.mini-label output { font-family: "JetBrains Mono", monospace; color: var(--text); }
+
+/* upload */
+.drop {
+  position: relative; height: 330px; display: grid; place-items: center; overflow: hidden; cursor: pointer;
+  border-style: dashed; border-color: rgba(155, 123, 255, 0.35); transition: border-color .15s, background .15s;
+}
+.drop:hover, .drop:focus-visible, .drop.over { border-color: rgba(155, 123, 255, 0.8); background: rgba(123, 92, 255, 0.08); outline: none; }
+.drop img { width: 100%; height: 100%; object-fit: contain; background: #000; }
+.drop-empty { display: grid; justify-items: center; gap: 6px; text-align: center; color: #b9bce0; padding: 16px; }
+.drop-empty svg { color: #9b7bff; }
+.drop-empty span { font-size: 13px; color: var(--muted); }
+.drop-clear {
+  position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+  color: #fff; background: rgba(12, 14, 30, 0.75); border: 1px solid var(--line); font-size: 14px;
+}
+
+/* examples */
+.ex-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.ex-grid button {
+  padding: 0; aspect-ratio: 1; border-radius: 10px; overflow: hidden; cursor: pointer; background: #000;
+  border: 1px solid var(--line); transition: transform .12s, border-color .12s;
+}
+.ex-grid button:hover, .ex-grid button:focus-visible { transform: translateY(-2px); border-color: rgba(155, 123, 255, 0.8); outline: none; }
+.ex-grid button.active { border-color: #9b7bff; box-shadow: 0 0 0 2px rgba(155, 123, 255, 0.35); }
+.ex-grid img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* tabs */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
+.tabs button {
+  font: inherit; font-weight: 600; font-size: 14px; color: var(--muted); background: none; cursor: pointer;
+  border: 0; border-bottom: 2px solid transparent; padding: 8px 14px; margin-bottom: -1px;
+}
+.tabs button[aria-selected="true"] { color: #f2f3ff; border-bottom-color: #9b7bff; }
+.flat { position: relative; display: grid; place-items: center; min-height: 600px; padding: 16px; }
+.flat canvas { width: min(100%, 560px); height: auto; aspect-ratio: 1; border-radius: 12px; }
+.flat-empty { position: absolute; color: var(--muted); font-size: 14px; text-align: center; padding: 20px; }
+
+/* controls */
+.controls { padding: 16px 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px 22px; }
+.controls .range { grid-column: 1 / -1; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips label {
+  display: inline-flex; align-items: center; gap: 7px; cursor: pointer; font-size: 13.5px;
+  padding: 6px 11px; border-radius: 10px; background: rgba(10, 12, 25, 0.8); border: 1px solid var(--line);
+  color: #c4c7e4; transition: all .12s;
+}
+.chips label:hover { border-color: rgba(155, 123, 255, 0.5); }
+.chips input { accent-color: #9b7bff; margin: 0; }
+.chips label:has(input:checked) { background: rgba(123, 92, 255, 0.25); border-color: rgba(155, 123, 255, 0.7); color: #fff; }
+input[type="range"] { width: 100%; accent-color: #9b7bff; }
+
+/* card states */
+.nl-loading .nl-label { font-size: 24px; color: #c9c4ff; }
+.progress { height: 6px; border-radius: 99px; background: rgba(255, 255, 255, 0.06); overflow: hidden; margin-top: 10px; position: relative; }
+.progress > div { height: 100%; width: var(--p, 0%); background: linear-gradient(90deg, #7b5cff, #f0569b); border-radius: inherit; transition: width .2s; }
+.progress.indeterminate > div { width: 35%; animation: slide 1.2s ease-in-out infinite; }
+@keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(300%); } }
+.nl-error .nl-label { color: #ff8fa8; font-size: 22px; }
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .controls { grid-template-columns: 1fr; }
+}
+@media (max-width: 720px) {
+  .wrap { padding: 0 16px 32px; }
+  .drop { height: 260px; }
+  .flat { min-height: 380px; }
+}

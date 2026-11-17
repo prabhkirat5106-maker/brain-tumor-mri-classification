@@ -6,6 +6,17 @@ The project also checks whether that number can be trusted: it finds and removes
 
 > This is a learning project, not a medical tool.
 
+## Live demo
+
+**[Try NeuroLens on Hugging Face](https://huggingface.co/spaces/prab12/neurolens)**: upload an MRI slice, see the
+prediction, and explore where the model looked on an interactive 3D brain. The model runs entirely in your browser,
+so scans never leave your device.
+
+![NeuroLens demo: a meningioma scan with the flagged area glowing red on a 3D brain](figures/demo_3d_brain.jpg)
+
+The heatmap is the same Grad-CAM as in the notebook. It is projected from the 2D slice onto a template brain, so
+the 3D position is an estimate. Details, and how to run it locally, are in [`demo/`](demo/README.md).
+
 ## Results
 
 | Model | Best val loss | Validation accuracy | Test accuracy |
@@ -104,14 +115,15 @@ MRI scans come in three views: axial (top-down), coronal (from the front) and sa
 ```
 brain_mri_cnn.ipynb   full notebook, with outputs
 figures/              plots used in this README
-requirements.txt      Python packages
+requirements.txt      Python packages for the notebook
+demo/                 NeuroLens: browser and Gradio demo (see demo/README.md)
 ```
 
-The dataset and trained weights (`*.pt`) are not included (see `.gitignore`). Download the dataset from Kaggle, set `data_path` in the notebook, and run the cells in order.
+The dataset and trained weights (`*.pt`) are not included (see `.gitignore`). Download the dataset from Kaggle, set `data_path` in the notebook, and run the cells in order. To run the demo locally, copy the saved `resnet18_best.pt` into `demo/weights/`.
 
 ## Next steps
 
 - Check for near-duplicates with perceptual hashing.
 - Collect or find no-tumor scans in the same style as the tumor scans, and test whether no-tumor precision holds.
 - Repeat training with several seeds and report the spread.
-- A small Gradio demo that shows the prediction and its Grad-CAM heatmap.
+- ~~A small Gradio demo that shows the prediction and its Grad-CAM heatmap.~~ Done: see [Live demo](#live-demo).

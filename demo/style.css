@@ -1,0 +1,50 @@
+/* Gradio-only styling. Shared parts live in web/neurolens.css and web/brain3d.css. */
+/* ---------- page backdrop ---------- */
+body, .gradio-container {
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(123, 92, 255, 0.22), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(224, 69, 143, 0.16), transparent 60%),
+    radial-gradient(800px 600px at 50% 120%, rgba(40, 200, 255, 0.10), transparent 60%),
+    #06070f !important;
+}
+.gradio-container {
+  max-width: 1320px !important;
+  margin: 0 auto !important;
+  padding: 0 20px 40px !important;
+}
+.gradio-container::before {
+  content: "";
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(150, 140, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(150, 140, 255, 0.05) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse at 50% 20%, black 30%, transparent 75%);
+}
+footer { display: none !important; }
+
+/* glassy panels */
+.block, .gr-group, .tabs, .nl-controls {
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* ---------- plot + tabs ---------- */
+#nl-plot { min-height: 560px; }
+#nl-plot .js-plotly-plot, #nl-plot .plot-container { background: transparent !important; }
+.tabs button[role="tab"] { font-weight: 600; letter-spacing: 0.01em; }
+.tabs button[role="tab"][aria-selected="true"] { color: #f2f3ff !important; }
+
+/* controls panel: same glass as the other blocks */
+.nl-controls, .nl-controls .block, .nl-controls .form, .nl-controls > div, .nl-controls .row {
+  background: rgba(20, 22, 40, 0.55) !important;
+}
+.nl-controls { border: 1px solid rgba(140, 130, 255, 0.14) !important; border-radius: 18px !important; overflow: hidden; }
+
+/* upload area */
+#nl-upload { border-style: dashed !important; }
+
+@media (max-width: 720px) {
+  .gradio-container { padding: 0 16px 32px !important; }
+  #nl-plot { min-height: 420px; }
+}

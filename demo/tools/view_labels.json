@@ -1,0 +1,347 @@
+{
+ "_note": "View labels for 80 test-split scans (A/C/S from brain_mri_cnn.ipynb audit); facing = side of the image the face points to, labelled for sagittal scans.",
+ "labels": [
+  {
+   "file": "glioma/gl-0976.jpg",
+   "view": "A"
+  },
+  {
+   "file": "glioma/gl-0456.jpg",
+   "view": "C"
+  },
+  {
+   "file": "glioma/gl-0296.jpg",
+   "view": "A"
+  },
+  {
+   "file": "glioma/gl-0187.jpg",
+   "view": "A"
+  },
+  {
+   "file": "glioma/gl-1351.jpg",
+   "view": "A"
+  },
+  {
+   "file": "glioma/gl-0634.jpg",
+   "view": "C"
+  },
+  {
+   "file": "glioma/gl-0659.jpg",
+   "view": "S",
+   "facing": "right"
+  },
+  {
+   "file": "glioma/gl-1029.jpg",
+   "view": "C"
+  },
+  {
+   "file": "glioma/gl-1130.jpg",
+   "view": "C"
+  },
+  {
+   "file": "glioma/gl-0231.jpg",
+   "view": "C"
+  },
+  {
+   "file": "glioma/gl-1063.jpg",
+   "view": "A"
+  },
+  {
+   "file": "glioma/gl-0936.jpg",
+   "view": "A"
+  },
+  {
+   "file": "glioma/gl-1420.jpg",
+   "view": "A"
+  },
+  {
+   "file": "glioma/gl-0128.jpg",
+   "view": "A"
+  },
+  {
+   "file": "glioma/gl-0762.jpg",
+   "view": "C"
+  },
+  {
+   "file": "glioma/gl-0009.jpg",
+   "view": "C"
+  },
+  {
+   "file": "glioma/gl-1350.jpg",
+   "view": "S",
+   "facing": "right"
+  },
+  {
+   "file": "glioma/gl-1184.jpg",
+   "view": "S",
+   "facing": "right"
+  },
+  {
+   "file": "glioma/gl-0488.jpg",
+   "view": "A"
+  },
+  {
+   "file": "glioma/gl-0289.jpg",
+   "view": "S",
+   "facing": "right"
+  },
+  {
+   "file": "meningioma/me-0913.jpg",
+   "view": "S",
+   "facing": "right"
+  },
+  {
+   "file": "meningioma/me-1543.jpg",
+   "view": "S",
+   "facing": "right"
+  },
+  {
+   "file": "meningioma/me-0328.jpg",
+   "view": "A"
+  },
+  {
+   "file": "meningioma/me-0519.jpg",
+   "view": "C"
+  },
+  {
+   "file": "meningioma/me-0497.jpg",
+   "view": "A"
+  },
+  {
+   "file": "meningioma/me-0156.jpg",
+   "view": "A"
+  },
+  {
+   "file": "meningioma/me-1484.jpg",
+   "view": "C"
+  },
+  {
+   "file": "meningioma/me-1256.jpg",
+   "view": "C"
+  },
+  {
+   "file": "meningioma/me-1054.jpg",
+   "view": "S",
+   "facing": "right"
+  },
+  {
+   "file": "meningioma/me-1184.jpg",
+   "view": "S",
+   "facing": "right"
+  },
+  {
+   "file": "meningioma/me-0809.jpg",
+   "view": "S",
+   "facing": "left"
+  },
+  {
+   "file": "meningioma/me-1759.jpg",
+   "view": "A"
+  },
+  {
+   "file": "meningioma/me-0915.jpg",
+   "view": "S",
+   "facing": "left"
+  },
+  {
+   "file": "meningioma/me-1690.jpg",
+   "view": "S",
+   "facing": "right"
+  },
+  {
+   "file": "meningioma/me-0199.jpg",
+   "view": "S",
+   "facing": "left"
+  },
+  {
+   "file": "meningioma/me-0765.jpg",
+   "view": "C"
+  },
+  {
+   "file": "meningioma/me-1239.jpg",
+   "view": "A"
+  },
+  {
+   "file": "meningioma/me-0318.jpg",
+   "view": "S",
+   "facing": "left"
+  },
+  {
+   "file": "meningioma/me-0375.jpg",
+   "view": "S",
+   "facing": "right"
+  },
+  {
+   "file": "meningioma/me-0908.jpg",
+   "view": "S",
+   "facing": "right"
+  },
+  {
+   "file": "notumor/no-1221.jpg",
+   "view": "A"
+  },
+  {
+   "file": "notumor/no-0168.jpg",
+   "view": "A"
+  },
+  {
+   "file": "notumor/no-0560.jpg",
+   "view": "A"
+  },
+  {
+   "file": "notumor/no-0866.jpg",
+   "view": "A"
+  },
+  {
+   "file": "notumor/no-0054.jpg",
+   "view": "A"
+  },
+  {
+   "file": "notumor/no-0539.jpg",
+   "view": "A"
+  },
+  {
+   "file": "notumor/no-0179.jpg",
+   "view": "A"
+  },
+  {
+   "file": "notumor/no-1126.jpg",
+   "view": "A"
+  },
+  {
+   "file": "notumor/no-1611.jpg",
+   "view": "A"
+  },
+  {
+   "file": "notumor/no-0670.jpg",
+   "view": "C"
+  },
+  {
+   "file": "notumor/no-0724.jpg",
+   "view": "C"
+  },
+  {
+   "file": "notumor/no-1916.jpg",
+   "view": "A"
+  },
+  {
+   "file": "notumor/no-1336.jpg",
+   "view": "A"
+  },
+  {
+   "file": "notumor/no-0215.jpg",
+   "view": "A"
+  },
+  {
+   "file": "notumor/no-1946.jpg",
+   "view": "A"
+  },
+  {
+   "file": "notumor/no-0675.jpg",
+   "view": "A"
+  },
+  {
+   "file": "notumor/no-0456.jpg",
+   "view": "A"
+  },
+  {
+   "file": "notumor/no-1083.jpg",
+   "view": "A"
+  },
+  {
+   "file": "notumor/no-1174.jpg",
+   "view": "A"
+  },
+  {
+   "file": "notumor/no-0996.jpg",
+   "view": "A"
+  },
+  {
+   "file": "pituitary/pi-0978.jpg",
+   "view": "C"
+  },
+  {
+   "file": "pituitary/pi-0811.jpg",
+   "view": "A"
+  },
+  {
+   "file": "pituitary/pi-1517.jpg",
+   "view": "A"
+  },
+  {
+   "file": "pituitary/pi-0163.jpg",
+   "view": "A"
+  },
+  {
+   "file": "pituitary/pi-0136.jpg",
+   "view": "A"
+  },
+  {
+   "file": "pituitary/pi-0105.jpg",
+   "view": "S",
+   "facing": "left"
+  },
+  {
+   "file": "pituitary/pi-1735.jpg",
+   "view": "A"
+  },
+  {
+   "file": "pituitary/pi-1492.jpg",
+   "view": "A"
+  },
+  {
+   "file": "pituitary/pi-0681.jpg",
+   "view": "S",
+   "facing": "left"
+  },
+  {
+   "file": "pituitary/pi-0365.jpg",
+   "view": "A"
+  },
+  {
+   "file": "pituitary/pi-0782.jpg",
+   "view": "A"
+  },
+  {
+   "file": "pituitary/pi-0210.jpg",
+   "view": "A"
+  },
+  {
+   "file": "pituitary/pi-1032.jpg",
+   "view": "S",
+   "facing": "left"
+  },
+  {
+   "file": "pituitary/pi-0925.jpg",
+   "view": "A"
+  },
+  {
+   "file": "pituitary/pi-0723.jpg",
+   "view": "S",
+   "facing": "left"
+  },
+  {
+   "file": "pituitary/pi-0145.jpg",
+   "view": "C"
+  },
+  {
+   "file": "pituitary/pi-0921.jpg",
+   "view": "S",
+   "facing": "left"
+  },
+  {
+   "file": "pituitary/pi-0664.jpg",
+   "view": "S",
+   "facing": "right"
+  },
+  {
+   "file": "pituitary/pi-1733.jpg",
+   "view": "A"
+  },
+  {
+   "file": "pituitary/pi-1373.jpg",
+   "view": "S",
+   "facing": "right"
+  }
+ ]
+}
