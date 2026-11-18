@@ -3,7 +3,8 @@
 **Live: [huggingface.co/spaces/prab12/neurolens](https://huggingface.co/spaces/prab12/neurolens)**
 (full screen: [prab12-neurolens.static.hf.space](https://prab12-neurolens.static.hf.space))
 
-Upload a brain MRI slice and the fine-tuned ResNet18 from the notebook classifies it, then shows where it looked:
+Upload a brain MRI slice and the v2 ResNet18 (the notebook's model, retrained with head cropping and stronger
+augmentation; see the main README) classifies it, then shows where it looked:
 
 - the predicted class with per-class probabilities
 - a **3D brain** you can rotate and zoom. The area the model flagged glows red. Hover or tap it for the tumor
@@ -32,10 +33,10 @@ One 2D slice fixes only two of the three coordinates, so the 3D position is an *
 
 1. **Slice orientation.** Two linear heads on the ResNet's own 512-d pooled features (`weights/view_head.pt`):
    - axial / coronal / sagittal, from the features plus 3 silhouette features (left-right symmetry, tissue at the
-     bottom edge, aspect ratio): **76/80** correct with leave-one-out on the 80 test scans hand-labelled for the
+     bottom edge, aspect ratio): **75/80** correct with leave-one-out on the 80 test scans hand-labelled for the
      notebook's view audit
    - for sagittal slices, which way the face points, from features(image) − features(mirrored image), so mirroring
-     flips the answer by construction: **20/22** with leave-one-out
+     flips the answer by construction: **21/22** with leave-one-out
 
    Low-confidence guesses are flagged in the UI, and **Scan view** overrides them.
 2. **In-plane position.** The heatmap hotspot (weighted centroid of activations ≥ 0.6) is converted from pixels to
@@ -50,8 +51,9 @@ cerebellum and brainstem are stylised shapes, since that surface only covers the
 
 ## Run it locally
 
-The trained weights aren't in the repo (`*.pt` is git-ignored). Run the notebook, which saves
-`resnet18_best.pt`, and copy that file to `demo/weights/`.
+The trained weights aren't in the repo (`*.pt` is git-ignored). Run `training/train_v2.py`, which saves
+`demo/weights/resnet18_v2.pt`. Every scan is cropped to the head first ([`head_crop.py`](head_crop.py)); the browser
+repeats the same crop and Pillow's exact resize, so both versions feed the model the same pixels.
 
 ```
 cd demo

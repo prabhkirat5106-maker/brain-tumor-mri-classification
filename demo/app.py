@@ -242,7 +242,7 @@ theme = gr.themes.Base(
 
 HERO = """
 <div class="nl-hero">
-  <div class="nl-badge"><span class="nl-dot"></span> ResNet18 · Grad-CAM · 99.0% test accuracy</div>
+  <div class="nl-badge"><span class="nl-dot"></span> ResNet18 v2 · 99.0% on test scans · 97.9% on outside scans</div>
   <h1>Neuro<span>Lens</span></h1>
   <p>Drop in a brain MRI slice. The network classifies it into one of four classes, then maps
   <em>where</em> it looked onto a 3D brain you can spin, zoom and hover.</p>

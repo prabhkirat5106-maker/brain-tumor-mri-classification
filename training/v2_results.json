@@ -1,0 +1,124 @@
+{
+ "v1": {
+  "temperature": 1.0861,
+  "test": {
+   "raw": {
+    "n": 1009,
+    "accuracy": 0.9901,
+    "recall": {
+     "glioma": 0.9918,
+     "meningioma": 0.9837,
+     "notumor": 0.9923,
+     "pituitary": 0.9923
+    },
+    "ece": 0.0066,
+    "nll": 0.0468,
+    "wrong": 10,
+    "wrong_over_90pct": 5
+   },
+   "calibrated": {
+    "n": 1009,
+    "accuracy": 0.9901,
+    "recall": {
+     "glioma": 0.9918,
+     "meningioma": 0.9837,
+     "notumor": 0.9923,
+     "pituitary": 0.9923
+    },
+    "ece": 0.0062,
+    "nll": 0.0453,
+    "wrong": 10,
+    "wrong_over_90pct": 5
+   }
+  },
+  "pmram": {
+   "raw": {
+    "n": 425,
+    "accuracy": 0.8682,
+    "recall": {
+     "glioma": 0.8288,
+     "meningioma": 0.8697,
+     "notumor": 1.0
+    },
+    "ece": 0.0606,
+    "nll": 0.4624,
+    "wrong": 56,
+    "wrong_over_90pct": 14
+   },
+   "calibrated": {
+    "n": 425,
+    "accuracy": 0.8682,
+    "recall": {
+     "glioma": 0.8288,
+     "meningioma": 0.8697,
+     "notumor": 1.0
+    },
+    "ece": 0.0489,
+    "nll": 0.4437,
+    "wrong": 56,
+    "wrong_over_90pct": 12
+   }
+  }
+ },
+ "v2": {
+  "temperature": 0.9071,
+  "test": {
+   "raw": {
+    "n": 1009,
+    "accuracy": 0.9901,
+    "recall": {
+     "glioma": 1.0,
+     "meningioma": 0.9756,
+     "notumor": 0.9961,
+     "pituitary": 0.9885
+    },
+    "ece": 0.0052,
+    "nll": 0.0444,
+    "wrong": 10,
+    "wrong_over_90pct": 4
+   },
+   "calibrated": {
+    "n": 1009,
+    "accuracy": 0.9901,
+    "recall": {
+     "glioma": 1.0,
+     "meningioma": 0.9756,
+     "notumor": 0.9961,
+     "pituitary": 0.9885
+    },
+    "ece": 0.008,
+    "nll": 0.0456,
+    "wrong": 10,
+    "wrong_over_90pct": 4
+   }
+  },
+  "pmram": {
+   "raw": {
+    "n": 425,
+    "accuracy": 0.9788,
+    "recall": {
+     "glioma": 0.9658,
+     "meningioma": 0.9874,
+     "notumor": 0.9756
+    },
+    "ece": 0.015,
+    "nll": 0.0921,
+    "wrong": 9,
+    "wrong_over_90pct": 4
+   },
+   "calibrated": {
+    "n": 425,
+    "accuracy": 0.9788,
+    "recall": {
+     "glioma": 0.9658,
+     "meningioma": 0.9874,
+     "notumor": 0.9756
+    },
+    "ece": 0.0142,
+    "nll": 0.0973,
+    "wrong": 9,
+    "wrong_over_90pct": 5
+   }
+  }
+ }
+}
